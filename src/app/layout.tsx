@@ -5,6 +5,7 @@ import { cookies } from "next/headers";
 
 import { TRPCReactProvider } from "~/trpc/react";
 import { ThemeProvider } from "./components/theme-provider";
+import { Header } from "./components/header";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -24,7 +25,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`font-sans ${inter.variable}`}>
+      <body className={`font-sans ${inter.variable} mx-auto max-w-7xl`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"
@@ -32,7 +33,10 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <TRPCReactProvider cookies={cookies().toString()}>
-            {children}
+            <>
+              <Header />
+              {children}
+            </>
           </TRPCReactProvider>
         </ThemeProvider>
       </body>

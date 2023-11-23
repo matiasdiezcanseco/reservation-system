@@ -1,11 +1,8 @@
-"use client";
-import Link from "next/link";
-import { api } from "../trpc/react";
-import { Spinner } from "./components/ui/spinner";
-import { Typography } from "./components/ui/typography";
+import { Label } from "@radix-ui/react-label";
 import { useState } from "react";
-import { Label } from "./components/ui/label";
-import { Input } from "./components/ui/input";
+import { Input } from "./ui/input";
+import { Typography } from "./ui/typography";
+import Link from "next/link";
 
 interface Flight {
   id: number;
@@ -57,24 +54,3 @@ export const FlightFilter: React.FC<{ flights: Flight[] }> = ({ flights }) => {
     </div>
   );
 };
-
-export default function Home() {
-  const {
-    data: flights,
-    isLoading,
-    error,
-  } = api.flights.getFlights.useQuery({});
-
-  return (
-    <main className="flex flex-col gap-6 px-4 pt-4">
-      <div className="flex flex-col gap-2">
-        <Typography variant="h1">Available flights</Typography>
-        <Typography variant="p">
-          Select a flight to reserve a seat for a passenger
-        </Typography>
-      </div>
-      {isLoading && <Spinner />}
-      {flights && <FlightFilter flights={flights} />}
-    </main>
-  );
-}

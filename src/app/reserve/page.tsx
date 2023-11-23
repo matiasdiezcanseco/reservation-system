@@ -3,6 +3,8 @@ import { useState } from "react";
 import { SelectSeats } from "../components/select-seats";
 import { Typography } from "../components/ui/typography";
 import { useSearchParams } from "next/navigation";
+import ManagePassengers from "../components/manage-passengers";
+import { Header } from "../components/header";
 
 export interface Passenger {
   id: number;
@@ -38,6 +40,29 @@ const passengersService: Passenger[] = [
   { id: 3, name: "John", lastName: "Smith", seatId: undefined },
   { id: 4, name: "Jane", lastName: "Smith", seatId: undefined },
 ];
+
+const SeatsSummary: React.FC<{ passengers: Passenger[] }> = ({
+  passengers,
+}) => {
+  return (
+    <div>
+      <Typography variant="p" fontSize="large">
+        Selected seats
+      </Typography>
+      <ul className="flex flex-col gap-2">
+        {passengers.map((passenger) => (
+          <li key={passenger.id}>
+            {passenger.name} {passenger.lastName}:{" "}
+            {passenger.seatId
+              ? seatsService.find((seat) => seat.id === passenger.seatId)?.code
+              : "Not selected"}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+};
+
 export default function Reserve() {
   const searchParams = useSearchParams();
   const flightId = searchParams.get("flightId");
@@ -54,6 +79,10 @@ export default function Reserve() {
       (passenger) => passenger.id === selectedPassengerId,
     );
     if (seat && passenger) {
+      const isSeatTaken = !!passengers.find(
+        (passenger) => passenger.seatId === seat.id,
+      );
+      if (isSeatTaken) return;
       setPassengers(
         passengers.map((passenger) =>
           passenger.id === selectedPassengerId
@@ -64,70 +93,37 @@ export default function Reserve() {
     }
   };
 
-  const selectedSeatsIds = passengers.map((passenger) => passenger.seatId);
-  const selectedPassenger = passengers.find(
-    (passenger) => passenger.id === selectedPassengerId,
-  );
+  const addPassenger = (passenger: Passenger) => {
+    setPassengers([...passengers, passenger]);
+  };
 
+  const selectedSeatsIds = passengers.map((passenger) => passenger.seatId);
   return (
     <main>
-      <Typography variant="h1">Reserve</Typography>
-      {flightId ? (
-        <>
-          <Typography variant="h2">Flight ID: {flightId}</Typography>
-          <div className="flex w-full gap-4">
-            <section>
-              <Typography variant="p" fontSize="large">
-                Select passenger
-              </Typography>
-              <Typography variant="p" fontSize="small">
-                Selected passenger: {selectedPassenger?.name}{" "}
-                {selectedPassenger?.lastName}
-              </Typography>
-              <ul className="flex flex-col gap-2">
-                {passengers.map((passenger) => (
-                  <li key={passenger.id}>
-                    <button
-                      className="rounded-md bg-slate-500 p-2 hover:bg-slate-600"
-                      onClick={() => setSelectedPassengerId(passenger.id)}
-                    >
-                      {passenger.name} {passenger.lastName}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </section>
-            <section>
-              <Typography variant="p" fontSize="large">
-                Select seats
-              </Typography>
+      <div className="flex flex-col gap-2 pt-2">
+        <Typography variant="h1">Reserve a flight</Typography>
+        {flightId ? (
+          <>
+            <Typography variant="h2">Flight ID: {flightId}</Typography>
+            <div className="flex w-full gap-4">
+              <ManagePassengers
+                onSelectPassenger={(id) => setSelectedPassengerId(id)}
+                passengers={passengers}
+                selectedPassengerId={selectedPassengerId}
+                onAddPassenger={(passenger) => addPassenger(passenger)}
+              />
               <SelectSeats
                 seats={seatsService}
                 selectedSeatsIds={selectedSeatsIds}
                 onSelectSeat={(seatId) => selectPassengerSeat(seatId)}
               />
-            </section>
-          </div>
-          <div>
-            <Typography variant="p" fontSize="large">
-              Selected seats
-            </Typography>
-            <ul className="flex flex-col gap-2">
-              {passengers.map((passenger) => (
-                <li key={passenger.id}>
-                  {passenger.name} {passenger.lastName}:{" "}
-                  {passenger.seatId
-                    ? seatsService.find((seat) => seat.id === passenger.seatId)
-                        ?.code
-                    : "Not selected"}
-                </li>
-              ))}
-            </ul>
-          </div>
-        </>
-      ) : (
-        <Typography variant="p">Couldn't find flight</Typography>
-      )}
+            </div>
+            <SeatsSummary passengers={passengers} />
+          </>
+        ) : (
+          <Typography variant="p">Couldn't find flight</Typography>
+        )}
+      </div>
     </main>
   );
 }
