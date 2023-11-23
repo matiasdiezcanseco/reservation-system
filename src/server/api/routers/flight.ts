@@ -5,7 +5,8 @@ import { flights, seats } from "../../db/mock-data";
 
 export const flightsRouter = createTRPCRouter({
   getFlights: publicProcedure.input(z.any()).query(async ({ input }) => {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    // throw new Error("Could not get flights");
     return flights;
   }),
 
