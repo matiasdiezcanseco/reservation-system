@@ -5,6 +5,8 @@ import { Typography } from "../components/ui/typography";
 import { useSearchParams } from "next/navigation";
 import ManagePassengers from "../components/manage-passengers";
 import { api } from "../../trpc/react";
+import { Spinner } from "../components/ui/spinner";
+import { AlertBar } from "../components/alert-bar";
 
 export interface Passenger {
   id: string;
@@ -67,62 +69,34 @@ export default function Reserve() {
     { enabled: !!flightId },
   );
 
-  const [passengers, setPassengers] = useState<Passenger[]>([
-    ...passengersService,
-  ]);
-
-  const [selectedPassengerId, setSelectedPassengerId] = useState("1");
-
-  const selectPassengerSeat = (seatId: string) => {
-    if (!seatsData) return;
-    const seat = seatsData.find((seat) => seat.id === seatId);
-    const passenger = passengers.find(
-      (passenger) => passenger.id === selectedPassengerId,
-    );
-    if (seat && passenger) {
-      const isSeatTaken = !!passengers.find(
-        (passenger) => passenger.seatId === seat.id,
-      );
-      if (isSeatTaken) return;
-      setPassengers(
-        passengers.map((passenger) =>
-          passenger.id === selectedPassengerId
-            ? { ...passenger, seatId: seat.id }
-            : passenger,
-        ),
-      );
-    }
-  };
-
-  const addPassenger = (passenger: Passenger) => {
-    setPassengers([...passengers, passenger]);
-  };
-
-  const selectedSeatsIds = passengers.map((passenger) => passenger.seatId);
   return (
     <main>
-      <div className="flex flex-col gap-2 pt-2">
+      <div className="flex flex-col gap-4 pt-2">
         <Typography variant="h1">Reserve a flight</Typography>
-        {flightId ? (
+        {isLoading && <Spinner />}
+        {!isLoading && flightId && (
           <>
-            <Typography variant="h2">Flight ID: {flightId}</Typography>
             <div className="flex w-full gap-4">
-              <ManagePassengers
-                onSelectPassenger={(id) => setSelectedPassengerId(id)}
-                passengers={passengers}
-                selectedPassengerId={selectedPassengerId}
-                onAddPassenger={(passenger) => addPassenger(passenger)}
-              />
               <SelectSeats
                 seats={seatsData ?? []}
-                selectedSeatsIds={selectedSeatsIds}
-                onSelectSeat={(seatId) => selectPassengerSeat(seatId)}
+                onConfirmSeats={(seatsIds) => console.log(seatsIds)}
               />
             </div>
-            <SeatsSummary passengers={passengers} seats={seatsData ?? []} />
           </>
-        ) : (
-          <Typography variant="p">Couldn't find flight</Typography>
+        )}
+        {error && (
+          <AlertBar
+            variant="destructive"
+            title="There was an error."
+            description="We could not reach our services."
+          ></AlertBar>
+        )}
+        {!flightId && (
+          <AlertBar
+            variant="destructive"
+            title="There was an error"
+            description="Couldn't find flight"
+          />
         )}
       </div>
     </main>
