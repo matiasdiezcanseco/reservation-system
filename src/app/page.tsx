@@ -9,18 +9,13 @@ import { Input } from "./components/ui/input";
 import { AlertBar } from "./components/alert-bar";
 
 interface Flight {
-  id: number;
+  id: string;
   name: string;
   start: string;
   destination: string;
 }
 
-const FlightCard: React.FC<{
-  id: number;
-  name: string;
-  start: string;
-  destination: string;
-}> = ({ id, name, start, destination }) => {
+const FlightCard: React.FC<Flight> = ({ id, name, start, destination }) => {
   return (
     <Link
       className="rounded-md border border-slate-500 p-2 hover:bg-slate-600/10"

@@ -4,45 +4,36 @@ import { SelectSeats } from "../components/select-seats";
 import { Typography } from "../components/ui/typography";
 import { useSearchParams } from "next/navigation";
 import ManagePassengers from "../components/manage-passengers";
-import { Header } from "../components/header";
+import { api } from "../../trpc/react";
 
 export interface Passenger {
-  id: number;
+  id: string;
   name: string;
   lastName: string;
-  seatId: number | undefined;
+  seatId: string | undefined;
 }
 
-const seatsService = [
-  { id: 1, row: 1, column: 1, code: "A1", isOccupied: false },
-  { id: 2, row: 1, column: 2, code: "A2", isOccupied: false },
-  { id: 3, row: 1, column: 3, code: "A3", isOccupied: false },
-  { id: 4, row: 1, column: 4, code: "A4", isOccupied: false },
-  { id: 5, row: 1, column: 5, code: "A5", isOccupied: false },
-  { id: 6, row: 1, column: 6, code: "A6", isOccupied: false },
-  { id: 7, row: 1, column: 7, code: "A7", isOccupied: false },
-  { id: 8, row: 1, column: 8, code: "A8", isOccupied: false },
-  { id: 9, row: 1, column: 9, code: "A9", isOccupied: false },
-  { id: 10, row: 1, column: 10, code: "A10", isOccupied: false },
-  { id: 11, row: 2, column: 1, code: "B1", isOccupied: false },
-  { id: 12, row: 2, column: 2, code: "B2", isOccupied: false },
-  { id: 13, row: 2, column: 3, code: "B3", isOccupied: false },
-  { id: 14, row: 3, column: 4, code: "B4", isOccupied: true },
-  { id: 15, row: 3, column: 5, code: "B5", isOccupied: false },
-  { id: 16, row: 3, column: 6, code: "B6", isOccupied: false },
-  { id: 17, row: 3, column: 7, code: "B7", isOccupied: true },
-  { id: 18, row: 3, column: 8, code: "B8", isOccupied: false },
-];
+export interface Seat {
+  id: string;
+  flightId: string;
+  row: number;
+  column: number;
+  seatPrice: number;
+  seatClass: string;
+  seatCode: string;
+  isOccupied: boolean;
+}
 
 const passengersService: Passenger[] = [
-  { id: 1, name: "John", lastName: "Doe", seatId: undefined },
-  { id: 2, name: "Jane", lastName: "Doe", seatId: undefined },
-  { id: 3, name: "John", lastName: "Smith", seatId: undefined },
-  { id: 4, name: "Jane", lastName: "Smith", seatId: undefined },
+  { id: "1", name: "John", lastName: "Doe", seatId: undefined },
+  { id: "2", name: "Jane", lastName: "Doe", seatId: undefined },
+  { id: "3", name: "John", lastName: "Smith", seatId: undefined },
+  { id: "4", name: "Jane", lastName: "Smith", seatId: undefined },
 ];
 
-const SeatsSummary: React.FC<{ passengers: Passenger[] }> = ({
+const SeatsSummary: React.FC<{ passengers: Passenger[]; seats: Seat[] }> = ({
   passengers,
+  seats,
 }) => {
   return (
     <div>
@@ -54,7 +45,7 @@ const SeatsSummary: React.FC<{ passengers: Passenger[] }> = ({
           <li key={passenger.id}>
             {passenger.name} {passenger.lastName}:{" "}
             {passenger.seatId
-              ? seatsService.find((seat) => seat.id === passenger.seatId)?.code
+              ? seats.find((seat) => seat.id === passenger.seatId)?.seatCode
               : "Not selected"}
           </li>
         ))}
@@ -67,14 +58,24 @@ export default function Reserve() {
   const searchParams = useSearchParams();
   const flightId = searchParams.get("flightId");
 
+  const {
+    data: seatsData,
+    error,
+    isLoading,
+  } = api.flights.getFlightSeatsByFlightId.useQuery(
+    { id: flightId ?? "" },
+    { enabled: !!flightId },
+  );
+
   const [passengers, setPassengers] = useState<Passenger[]>([
     ...passengersService,
   ]);
 
-  const [selectedPassengerId, setSelectedPassengerId] = useState(1);
+  const [selectedPassengerId, setSelectedPassengerId] = useState("1");
 
-  const selectPassengerSeat = (seatId: number) => {
-    const seat = seatsService.find((seat) => seat.id === seatId);
+  const selectPassengerSeat = (seatId: string) => {
+    if (!seatsData) return;
+    const seat = seatsData.find((seat) => seat.id === seatId);
     const passenger = passengers.find(
       (passenger) => passenger.id === selectedPassengerId,
     );
@@ -113,12 +114,12 @@ export default function Reserve() {
                 onAddPassenger={(passenger) => addPassenger(passenger)}
               />
               <SelectSeats
-                seats={seatsService}
+                seats={seatsData ?? []}
                 selectedSeatsIds={selectedSeatsIds}
                 onSelectSeat={(seatId) => selectPassengerSeat(seatId)}
               />
             </div>
-            <SeatsSummary passengers={passengers} />
+            <SeatsSummary passengers={passengers} seats={seatsData ?? []} />
           </>
         ) : (
           <Typography variant="p">Couldn't find flight</Typography>

@@ -7,8 +7,8 @@ import { Label } from "./ui/label";
 
 interface ManagePassengersProps {
   passengers: Passenger[];
-  selectedPassengerId: number;
-  onSelectPassenger: (passengerId: number) => void;
+  selectedPassengerId: Passenger["id"];
+  onSelectPassenger: (passengerId: Passenger["id"]) => void;
   onAddPassenger: (passenger: Passenger) => void;
 }
 
@@ -28,7 +28,7 @@ const ManagePassengers: React.FC<ManagePassengersProps> = ({
       name: { value: string };
       lastName: { value: string };
     };
-    const randomId = Math.floor(Math.random() * 1000);
+    const randomId = Math.floor(Math.random() * 1000).toString();
     onAddPassenger({
       id: randomId,
       name: name.value,

@@ -10,12 +10,11 @@ export const flightsRouter = createTRPCRouter({
     return flights;
   }),
 
-  getFlightDataById: publicProcedure
-    .input(z.object({ id: z.number() }))
+  getFlightSeatsByFlightId: publicProcedure
+    .input(z.object({ id: z.string() }))
     .query(({ input }) => {
-      return {
-        seats: seats.filter((seat) => seat.flightId === input.id),
-      };
+      // throw new Error("Could not get seats for flight");
+      return seats.filter((seat) => seat.flightId === input.id);
     }),
 
   // create: protectedProcedure

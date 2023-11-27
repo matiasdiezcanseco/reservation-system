@@ -1,17 +1,12 @@
 "use client";
 
+import type { Seat } from "../reserve/page";
 import { Typography } from "./ui/typography";
 
 interface SelectSeatsProps {
-  seats: {
-    id: number;
-    row: number;
-    column: number;
-    code: string;
-    isOccupied: boolean;
-  }[];
-  selectedSeatsIds: (number | undefined)[];
-  onSelectSeat: (seatId: number) => void;
+  seats: Seat[];
+  selectedSeatsIds: (Seat["id"] | undefined)[];
+  onSelectSeat: (seatId: Seat["id"]) => void;
 }
 
 export const SelectSeats: React.FC<SelectSeatsProps> = ({
@@ -56,7 +51,7 @@ export const SelectSeats: React.FC<SelectSeatsProps> = ({
               if (!seat.isOccupied) onSelectSeat(seat.id);
             }}
           >
-            {seat.code}
+            {seat.seatCode}
           </button>
         ))}
       </div>
