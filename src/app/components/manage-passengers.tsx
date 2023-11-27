@@ -1,4 +1,4 @@
-import type { Passenger } from "../reserve/page";
+import type { Passenger } from "../reserve/seats/page";
 import { Input } from "./ui/input";
 import { Typography } from "./ui/typography";
 import { Button } from "./ui/button";

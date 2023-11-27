@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import type { Seat } from "../reserve/page";
+import type { Seat } from "../reserve/seats/page";
 import { AlertBar } from "./alert-bar";
 import { Typography } from "./ui/typography";
 import { Button } from "./ui/button";
@@ -85,24 +85,36 @@ export const SelectSeats: React.FC<SelectSeatsProps> = ({
         </div>
       )}
       {selectedSeatsIds.length > 0 && (
-        <Typography variant="p" className="text-zinc-400">
-          Selected seats:
-          {selectedSeatsIds
-            .map((seatId) => {
+        <div className="flex flex-col gap-2">
+          <Typography variant="p" className="text-zinc-400">
+            Selected seats:
+            {selectedSeatsIds
+              .map((seatId) => {
+                const seat = seats.find((seat) => seat.id === seatId);
+                if (!seat) return null;
+                return ` ${seat.seatCode}`;
+              })
+              .join(",")}
+          </Typography>
+          <Typography variant="p" className="text-zinc-400">
+            Total price: $
+            {selectedSeatsIds.reduce((acc, seatId) => {
               const seat = seats.find((seat) => seat.id === seatId);
-              if (!seat) return null;
-              return ` ${seat.seatCode}`;
-            })
-            .join(",")}
-        </Typography>
+              if (!seat) return acc;
+              return acc + seat.seatPrice;
+            }, 0)}
+          </Typography>
+        </div>
       )}
 
-      <Button
-        variant="default"
-        onClick={() => handleConfirmSeats(selectedSeatsIds)}
-      >
-        Confirm selection
-      </Button>
+      {availableSeatsCount > 0 && (
+        <Button
+          variant="default"
+          onClick={() => handleConfirmSeats(selectedSeatsIds)}
+        >
+          Confirm selection
+        </Button>
+      )}
       {error && (
         <Typography variant="p" className="text-red-500">
           {error}

@@ -3,7 +3,7 @@ import Link from "next/link";
 import { api } from "../trpc/react";
 import { Spinner } from "./components/ui/spinner";
 import { Typography } from "./components/ui/typography";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { Label } from "./components/ui/label";
 import { Input } from "./components/ui/input";
 import { AlertBar } from "./components/alert-bar";
@@ -19,7 +19,7 @@ const FlightCard: React.FC<Flight> = ({ id, name, start, destination }) => {
   return (
     <Link
       className="rounded-md border border-slate-500 p-2 hover:bg-slate-600/10"
-      href={`/reserve?flightId=${id}`}
+      href={`/reserve/seats?flightId=${id}`}
     >
       <Typography variant="h2">{name}</Typography>
       <Typography variant="p">Start: {start}</Typography>
@@ -74,7 +74,9 @@ export const FlightFilter: React.FC<{ flights: Flight[] }> = ({ flights }) => {
       <div>
         <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3">
           {filteredFlights.map((flight) => (
-            <FlightCard {...flight} />
+            <Fragment key={flight.id}>
+              <FlightCard {...flight} />
+            </Fragment>
           ))}
         </ul>
       </div>
