@@ -1,4 +1,4 @@
-import { Typography } from "../components/ui/typography";
+import { Typography } from "../_components/ui/typography";
 
 export default function ReserveLayout({
   children,

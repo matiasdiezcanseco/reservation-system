@@ -1,20 +1,9 @@
 "use client";
-import { SelectSeats } from "../../components/select-seats";
+import { SelectSeats } from "../../_components/select-seats";
 import { useRouter, useSearchParams } from "next/navigation";
 import { api } from "../../../trpc/react";
-import { Spinner } from "../../components/ui/spinner";
-import { AlertBar } from "../../components/alert-bar";
-
-export interface Seat {
-  id: string;
-  flightId: string;
-  row: number;
-  column: number;
-  seatPrice: number;
-  seatClass: string;
-  seatCode: string;
-  isOccupied: boolean;
-}
+import { Spinner } from "../../_components/ui/spinner";
+import { AlertBar } from "../../_components/alert-bar";
 
 export default function Seats() {
   const searchParams = useSearchParams();
@@ -32,7 +21,7 @@ export default function Seats() {
   const router = useRouter();
 
   return (
-    <div className="flex flex-col gap-4 p-2">
+    <div className="flex flex-col gap-4">
       {flightId ? (
         <>
           {isLoading && <Spinner />}

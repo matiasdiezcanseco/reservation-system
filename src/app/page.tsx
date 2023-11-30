@@ -1,19 +1,13 @@
 "use client";
 import Link from "next/link";
 import { api } from "../trpc/react";
-import { Spinner } from "./components/ui/spinner";
-import { Typography } from "./components/ui/typography";
+import { Spinner } from "./_components/ui/spinner";
+import { Typography } from "./_components/ui/typography";
 import { Fragment, useState } from "react";
-import { Label } from "./components/ui/label";
-import { Input } from "./components/ui/input";
-import { AlertBar } from "./components/alert-bar";
-
-interface Flight {
-  id: string;
-  name: string;
-  start: string;
-  destination: string;
-}
+import { Label } from "./_components/ui/label";
+import { Input } from "./_components/ui/input";
+import { AlertBar } from "./_components/alert-bar";
+import type { Flight } from "../server/api/routers/flight";
 
 const FlightCard: React.FC<Flight> = ({ id, name, start, destination }) => {
   return (

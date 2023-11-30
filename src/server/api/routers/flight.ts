@@ -3,6 +3,10 @@ import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { flights, seats } from "../../db/mock-data";
 
+export type Seat = (typeof seats)[0];
+
+export type Flight = (typeof flights)[0];
+
 export const flightsRouter = createTRPCRouter({
   getFlights: publicProcedure.input(z.any()).query(async ({ input }) => {
     await new Promise((resolve) => setTimeout(resolve, 500));
